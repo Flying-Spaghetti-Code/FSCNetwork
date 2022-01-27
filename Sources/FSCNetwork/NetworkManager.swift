@@ -102,7 +102,7 @@ public class NetworkManager: NSObject{
         currentTask?.resume()
     }
     
-    private func cancelCurrentTaskIfRunning(){
+    public func cancelCurrentTaskIfRunning(){
         if currentTask?.state == .running {
             currentTask?.cancel()
         }
