@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol NetworkRequest{
+public protocol NetworkRequest{
     var url: String {get}
     var method: HTTPMethod {get}
     var body: Data? {get}
@@ -21,7 +21,7 @@ protocol NetworkRequest{
     func isResponseValid(_ response: HTTPURLResponse, with networkManager: NetworkManager, completion: @escaping NetCallBack) -> Bool
 }
 
-extension NetworkRequest {
+public extension NetworkRequest {
     // default values
     var body : Data? { nil }
     var customHeaders : [String : String]? { nil }

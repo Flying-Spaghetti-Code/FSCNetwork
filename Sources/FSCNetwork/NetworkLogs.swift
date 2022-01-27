@@ -12,7 +12,7 @@ import UIKit
 
 let log = Logger()
 
-extension URLRequest{
+public extension URLRequest{
     var formattedString : String {
         var message = "---REQUEST------------------\n"
         message.append("URL: \(self.url?.description ?? "NO URL")\n")
@@ -35,7 +35,7 @@ extension URLRequest{
     
 }
 
-extension HTTPURLResponse{
+public extension HTTPURLResponse{
     private var formattedString : String {
         var message = "---RESPONSE------------------\n"
         message.append("URL: \(url?.description ?? "NO URL")\n")

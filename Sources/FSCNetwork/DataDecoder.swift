@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension Optional where Wrapped == Data {
+public extension Optional where Wrapped == Data {
     var decoded: String {
         
         guard let data = self else {
@@ -20,7 +20,7 @@ extension Optional where Wrapped == Data {
     }
 }
 
-extension Data {
+public extension Data {
     var decoded: String {
         guard let decodedData = String(data: self, encoding: .utf8) else {
             return "--not decodable as string--"

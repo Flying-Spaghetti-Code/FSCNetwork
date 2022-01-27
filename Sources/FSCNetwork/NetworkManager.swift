@@ -9,15 +9,15 @@
 import Foundation
 import OSLog
 
-typealias NetCallBack = (Result<Data, NetworkError>) -> (Void)
+public typealias NetCallBack = (Result<Data, NetworkError>) -> (Void)
 
-class NetworkManager: NSObject{
+public class NetworkManager: NSObject{
     
     private var currentTask: URLSessionDataTask?
     private var maxAttempts: Int
     private var attempts: Int
     
-    init(maxAttempts : Int = 2 ){
+    public init(maxAttempts : Int = 2 ){
         self.maxAttempts = maxAttempts
         self.attempts = maxAttempts
     }
@@ -26,7 +26,7 @@ class NetworkManager: NSObject{
         log.debug("[RETAIN] - NetworkManager was deinit")
     }
     
-    func fire(request: NetworkRequest, completion: @escaping NetCallBack){
+    public func fire(request: NetworkRequest, completion: @escaping NetCallBack){
         
         guard let token = request.token else {
             cancelCurrentTaskIfRunning()
@@ -102,7 +102,7 @@ class NetworkManager: NSObject{
         currentTask?.resume()
     }
     
-    func cancelCurrentTaskIfRunning(){
+    private func cancelCurrentTaskIfRunning(){
         if currentTask?.state == .running {
             currentTask?.cancel()
         }
