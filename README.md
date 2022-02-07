@@ -1,6 +1,6 @@
 # FSCNetwork
 
-FSCNetwork is a lightweit and hi customizable HTTP networking library. it is usefull when you need to make many authenticated call against an api network service.
+FSCNetwork is a lightweight and hi customizable HTTP networking library. It is useful when you need to make many authenticated calls against an API network service.
 
 ## Install
 

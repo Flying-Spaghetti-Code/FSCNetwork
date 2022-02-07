@@ -8,15 +8,13 @@
 
 import Foundation
 
-public protocol NetworkRequest{
+public protocol NetworkRequest: OAuthHandler{
     var url: String {get}
     var method: HTTPMethod {get}
     var body: Data? {get}
-    var token: String? { get }
     var eTag: String? { get }
     var customHeaders: [String : String]? { get }
     var sessionDelegate: URLSessionDelegate & URLSessionTaskDelegate { get }
-    func refreshToken(callback: ((Bool)->())?)
     func getETagDataIfAvailable(_ response: HTTPURLResponse, _ data: Data) -> Data?
     func isResponseValid(_ response: HTTPURLResponse, with networkManager: NetworkManager, completion: @escaping NetCallBack) -> Bool
 }

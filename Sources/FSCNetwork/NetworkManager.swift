@@ -26,19 +26,26 @@ public class NetworkManager: NSObject{
         log.debug("[RETAIN] - NetworkManager was deinit")
     }
     
+    fileprivate func handleAuthentication(_ handler: NetworkRequest, _ completion: @escaping NetCallBack, _ urlRequest: inout URLRequest) {
+        if handler.needAuthentication {
+            guard let token = handler.token else {
+                cancelCurrentTaskIfRunning()
+                handleTokenRefresh(request: handler, completion: completion)
+                return
+            }
+            urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+    }
+    
     public func fire(request: NetworkRequest, completion: @escaping NetCallBack){
         
-        guard let token = request.token else {
-            cancelCurrentTaskIfRunning()
-            handleTokenRefresh(request: request, completion: completion)
-            return
-        }
         let urlString = "\(request.url)"
         
         log.debug("Calling: \(urlString)")
         var urlRequest = URLRequest(url: URL(string: urlString)!)
+        handleAuthentication(request, completion, &urlRequest)
+        
         urlRequest.httpMethod = request.method.rawValue
-        urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         urlRequest.setCustomHeaders(request.customHeaders)
         urlRequest.httpBody = request.body
         urlRequest.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
