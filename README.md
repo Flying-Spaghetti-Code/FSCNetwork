@@ -19,47 +19,15 @@ public protocol NetworkRequest{
     var url: String {get}
     var method: HTTPMethod {get}
     var body: Data? {get}
-    var token: String? { get }
     var eTag: String? { get }
     var customHeaders: [String : String]? { get }
     var sessionDelegate: URLSessionDelegate & URLSessionTaskDelegate { get }
-    func refreshToken(callback: ((Bool)->())?)
     func getETagDataIfAvailable(_ response: HTTPURLResponse, _ data: Data) -> Data?
     func isResponseValid(_ response: HTTPURLResponse, with networkManager: NetworkManager, completion: @escaping NetCallBack) -> Bool
 }
 ```
 
-the sugested way is to extend the protocol directly for all those elements that are always the same. For example the token handling.
-
-```swift
-// MARK: - TokenHandling
-extension NetworkRequest {
-
-    var token: String? {
-
-        // put here the code to retrieve the last access token
-        // from keychain or storage. For example: 
-
-        guard let token = try? getAccessToken() else {
-            return nil
-        }
-        return token
-    }
-
-    func refreshToken(callback: ((Bool) -> ())?) {
-
-        // put here the code to renew the expired token and send the result to the callback block
-        guard let token = refreshToken() else {
-            callback?(false)
-            return
-        }
-
-        callback?(true)
-    }
-}
-```
-
-or the etag support
+the sugested way is to extend the protocol directly for all those elements that are always the same. For example the Entity Tag (ETag) handling.
 
 ```swift
 // MARK: - ETagSupport
@@ -90,6 +58,43 @@ extension  NetworkRequest {
     }
 }
 ```
+
+
+### Authentication
+
+If your network API service implement an oAuth 2.0 authentication protocol. you may handle it Enabling the authentication extending your networ request.
+
+```swift
+// MARK: - TokenHandling
+extension NetworkRequest {
+
+    // Enable the authentication
+    var needAuthentication: Bool { return true }
+
+    var token: String? {
+
+        // put here the code to retrieve the last access token
+        // from keychain or storage. For example: 
+
+        guard let token = try? getAccessToken() else {
+            return nil
+        }
+        return token
+    }
+
+    func refreshToken(callback: ((Bool) -> ())?) {
+
+        // put here the code to renew the expired token and send the result to the callback block
+        guard let token = refreshToken() else {
+            callback?(false)
+            return
+        }
+
+        callback?(true)
+    }
+}
+```
+
 
 ### Setting up the calls
 
@@ -165,16 +170,15 @@ if the client needs to check some custom header to validate the response, then i
 
 ```swift
 func isResponseValid(_ response: HTTPURLResponse, with networkManager: NetworkManager, completion: @escaping NetCallBack) -> Bool {
-    
+
     guard let custom = response.allHeaderFields["Custom-field"] else {
         // maybe I want to retry
         networkManager.fire(request: self, completion: completion)
         return false
     }
-    
+
     return true
 }
-
 ```
 
 ### Firing and parsing
@@ -183,10 +187,10 @@ The library contains a built in generic parser for Codables which accept as para
 
 ```swift
 func fetchData(completion: @escaping ((Result<YourCodableClass, NetworkError>) -> (Void))) {
-        
+
     let parser = APIParser<YourCodableClass>()
     NetworkManager().fire(request: YourRequest.fetchData) { (result) -> (Void) in
-            
+
         parser.parseResult(result, completion: completion)
     }
 }
