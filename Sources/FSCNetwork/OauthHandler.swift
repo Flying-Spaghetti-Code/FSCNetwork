@@ -10,7 +10,13 @@ import Foundation
 public protocol OAuthHandler {
     var needAuthentication: Bool {get}
     var token: String? { get }
-    func refreshToken(callback: ((Bool)->())?)
+    func refreshToken(callback: ((TokenResponse)->())?)
+}
+
+public enum TokenResponse{
+    case refreshed
+    case aborted
+    case failed
 }
 
 // MARK: - default is: authentication not needed

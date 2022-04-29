@@ -13,6 +13,7 @@ public enum NetworkError: Error {
     case serverFailure(withHTTPCode: Int)
     case failedToParse(body: String)
     case failedtoRefreshToken
+    case aborted
     case maxAttemptsExceeded
     case noData
     case custom(message: String)
@@ -29,6 +30,7 @@ extension NetworkError: LocalizedError {
             case .failedtoRefreshToken: return "Unable to refresh token"
             case .maxAttemptsExceeded: return "Max number of authentication attempts exceeded"
             case .custom(let message): return "\(message)"
+            case .aborted: return "Call aborted"
         }
     }
 }

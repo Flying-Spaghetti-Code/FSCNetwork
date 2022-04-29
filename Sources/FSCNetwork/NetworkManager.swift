@@ -116,17 +116,20 @@ public class NetworkManager: NSObject{
     }
     
     private func handleTokenRefresh(request: NetworkRequest, completion: @escaping NetCallBack) {
+        let queue = WaitingRequestQueue.instance
+        queue.enqueue(request, completion)
         if self.attempts > 0 {
-            request.refreshToken { (isSuccess) in
-                
-                if isSuccess {
-                    self.attempts -= 1
-                    log.info("Token expired. Refiring the call")
-                    self.fire(request: request, completion: completion)
-                }else{
-                    completion(.failure(.failedtoRefreshToken))
+            request.refreshToken { (response) in
+                switch response {
+                    case .refreshed :
+                        self.attempts -= 1
+                        while let element = queue.dequeue() {
+                            log.info("Token refreshed. Refiring the call")
+                            self.fire(request: element.request, completion: element.completion)
+                        }
+                    case .aborted : break
+                    case .failed : completion(.failure(.failedtoRefreshToken))
                 }
-                
             }
         } else {
             completion(.failure(.maxAttemptsExceeded))
