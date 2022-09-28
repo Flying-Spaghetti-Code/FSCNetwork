@@ -18,7 +18,7 @@ public extension URLRequest{
         message.append("URL: \(self.url?.description ?? "NO URL")\n")
         message.append("METHOD: \(httpMethod ?? "CUSTOM")\n")
         
-        for field in allHTTPHeaderFields ?? [String: String](){
+        for field in allSecureHTTPHeaderfields {
             message.append("\(field.key): \(field.value)\n")
         }
         
@@ -33,6 +33,23 @@ public extension URLRequest{
         return message
     }
     
+    var allSecureHTTPHeaderfields: [String: String] {
+        
+        var result = [String:String]()
+        for field in allHTTPHeaderFields ?? [:] {
+            if field.key.lowercased() == "authorization" {
+                continue
+            }
+            if field.value.lowercased().contains("token") {
+                continue
+            }
+            if field.key.lowercased().contains("token") {
+                continue
+            }
+            result[field.key] = field.value
+        }
+        return result
+    }
 }
 
 public extension HTTPURLResponse{
