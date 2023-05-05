@@ -10,7 +10,7 @@ import Foundation
 
 public enum NetworkError: Error {
     case noInternet
-    case serverFailure(withHTTPCode: Int)
+    case serverFailure(withHTTPCode: Int, rawData: Data)
     case failedToParse(body: String)
     case failedtoRefreshToken
     case aborted
@@ -31,6 +31,15 @@ extension NetworkError: LocalizedError {
             case .maxAttemptsExceeded: return "Max number of authentication attempts exceeded"
             case .custom(let message): return "\(message)"
             case .aborted: return "Call aborted"
+        }
+    }
+}
+
+extension NetworkError {
+    public var rawBody: Data? {
+        switch self {
+            case .serverFailure(_ , let data): return data
+            default: return nil
         }
     }
 }

@@ -87,7 +87,7 @@ public class NetworkManager: NSObject{
                 var message = "Server responded with error code \(response.statusCode) to request \(request) at: \(urlString)"
                 message.append("\n \(urlRequest.formattedString)\(response.formattedString(for: data))\n")
                 log.error("\(message)")
-                completion(.failure(.serverFailure(withHTTPCode: response.statusCode)))
+                completion(.failure(.serverFailure(withHTTPCode: response.statusCode, rawData: data)))
                 return
             }
             
