@@ -10,6 +10,7 @@ import Foundation
 import OSLog
 
 public typealias NetCallBack = (Result<Data, NetworkError>) -> (Void)
+public typealias NetCallReply = Result<Data, NetworkError>
 
 public class NetworkManager: NSObject{
     
@@ -141,6 +142,16 @@ public class NetworkManager: NSObject{
         }
     }
     
+    public func fire(request: NetworkRequest) async throws -> Data {
+        try await withCheckedThrowingContinuation { continuation in
+            fire(request: request) { result in
+                switch result {
+                    case .success(let data): continuation.resume(returning: data)
+                    case .failure(let error): continuation.resume(throwing: error)
+                }
+            }
+        }
+    }    
 }
 
 extension URLRequest {
