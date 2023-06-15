@@ -10,6 +10,7 @@ import Foundation
 import OSLog
 
 public typealias NetCallBack = (Result<Data, NetworkError>) -> (Void)
+public typealias NetCallReply = Result<Data, NetworkError>
 
 public class NetworkManager: NSObject{
     
@@ -42,7 +43,12 @@ public class NetworkManager: NSObject{
         let urlString = "\(request.url)"
         
         log.debug("Calling: \(urlString)")
-        var urlRequest = URLRequest(url: URL(string: urlString)!)
+        guard let callURL = URL(string: urlString) else {
+            log.error("Tried to call an invalid URL at '\(urlString)'")
+            completion(.failure(.aborted))
+            return
+        }
+        var urlRequest = URLRequest(url: callURL)
         handleAuthentication(request, completion, &urlRequest)
         
         urlRequest.httpMethod = request.method.rawValue
@@ -136,6 +142,16 @@ public class NetworkManager: NSObject{
         }
     }
     
+    public func fire(request: NetworkRequest) async throws -> Data {
+        try await withCheckedThrowingContinuation { continuation in
+            fire(request: request) { result in
+                switch result {
+                    case .success(let data): continuation.resume(returning: data)
+                    case .failure(let error): continuation.resume(throwing: error)
+                }
+            }
+        }
+    }    
 }
 
 extension URLRequest {
