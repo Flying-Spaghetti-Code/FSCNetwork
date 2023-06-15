@@ -42,7 +42,12 @@ public class NetworkManager: NSObject{
         let urlString = "\(request.url)"
         
         log.debug("Calling: \(urlString)")
-        var urlRequest = URLRequest(url: URL(string: urlString)!)
+        guard let callURL = URL(string: urlString) else {
+            log.error("Tried to call an invalid URL at '\(urlString)'")
+            completion(.failure(.aborted))
+            return
+        }
+        var urlRequest = URLRequest(url: callURL)
         handleAuthentication(request, completion, &urlRequest)
         
         urlRequest.httpMethod = request.method.rawValue
