@@ -8,7 +8,6 @@
 
 import Foundation
 import OSLog
-import UIKit
 
 let log = Logger()
 
