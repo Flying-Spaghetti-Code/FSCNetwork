@@ -63,7 +63,7 @@ public class NetworkManager: NSObject{
         log.debug("Request Body: \(request.body.decoded)")
         urlRequest.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Accept")
         
-        if case .post = request.method {
+        if case .post = request.method && urlRequest.allHTTPHeaderFields?["Content-Type"] != nil {
             urlRequest.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         }
         
