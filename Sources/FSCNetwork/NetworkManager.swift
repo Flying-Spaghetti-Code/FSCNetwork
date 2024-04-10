@@ -52,6 +52,10 @@ public class NetworkManager: NSObject{
         handleAuthentication(request, completion, &urlRequest)
         
         urlRequest.httpMethod = request.method.rawValue
+        if case .post = request.method {
+            urlRequest.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+        }
+        
         urlRequest.setCustomHeaders(request.customHeaders)
         urlRequest.httpBody = request.body
         urlRequest.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
@@ -62,10 +66,6 @@ public class NetworkManager: NSObject{
 
         log.debug("Request Body: \(request.body.decoded)")
         urlRequest.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Accept")
-        
-        if case .post = request.method && urlRequest.allHTTPHeaderFields?["Content-Type"] != nil {
-            urlRequest.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
-        }
         
         let config = URLSessionConfiguration.default
         let urlSession = URLSession(configuration: config, delegate: request.sessionDelegate, delegateQueue: nil)
