@@ -75,6 +75,7 @@ public class NetworkManager: NSObject{
             // check if the request was cancelled in the meantime
             if let error = error as NSError?, error.domain == NSURLErrorDomain && error.code == NSURLErrorCancelled {
                 // task was cancelled
+                completion(.failure(.aborted))
                 return
             }
             
@@ -86,6 +87,7 @@ public class NetworkManager: NSObject{
             if response.statusCode == 401 {
                 self.cancelCurrentTaskIfRunning()
                 self.handleTokenRefresh(request: request, completion: completion)
+                completion(.failure(.failedtoRefreshToken))
                 return
             }
 
@@ -102,7 +104,8 @@ public class NetworkManager: NSObject{
                 return
             }
             
-            guard request.isResponseValid(response, with: self, completion: completion) else{
+            guard request.isResponseValid(response, with: self, completion: completion) else {
+                completion(.failure(.noData))
                 return
             }
                         
@@ -133,8 +136,8 @@ public class NetworkManager: NSObject{
                             log.info("Token refreshed. Refiring the call")
                             self.fire(request: element.request, completion: element.completion)
                         }
-                    case .aborted : break
-                    case .failed : completion(.failure(.failedtoRefreshToken))
+                    case .aborted: completion(.failure(.aborted))
+                    case .failed: completion(.failure(.failedtoRefreshToken))
                 }
             }
         } else {
