@@ -79,7 +79,13 @@ public class NetworkManager: NSObject{
                 return
             }
             
+            if (error as? URLError)?.errorCode == -1001 {
+                completion(.failure(.timedOut))
+                return
+            }
+            
             guard let data = data, let response = response as? HTTPURLResponse, error == nil else {
+                
                 completion(.failure(.noData))
                 return
             }
